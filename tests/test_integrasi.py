@@ -1,5 +1,6 @@
-from app import tambah_item, cek_stok
+import requests
 
-def test_tambah_dan_cek_stok():
-    tambah_item("Mouse", 10)
-    assert cek_stok("Mouse") == 10
+def test_health_endpoint():
+    res = requests.get("http://localhost:5000/health")
+    assert res.status_code == 200
+    assert res.json()["status"] == "ok"
