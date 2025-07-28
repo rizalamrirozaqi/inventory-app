@@ -8,42 +8,31 @@ pipeline {
       }
     }
 
-    stage('Build Docker Image') {
+    stage('Install Dependencies') {
+      steps {
+        sh 'pip install -r requirements.txt'
+      }
+    }
+
+    stage('Run Tests') {
+      steps {
+        sh 'pytest tests/'
+      }
+    }
+
+    stage('Build Docker') {
       steps {
         sh 'docker build -t inventory-app .'
       }
     }
+  }
 
-    stage('Test') {
-      steps {
-        sh 'pytest --junitxml=test-results.xml tests/'
-      }
+  post {
+    success {
+      echo 'Pipeline finished successfully!'
     }
-    post {
-      always {
-        junit 'test-results.xml'
-      }
-    }
-
-    stage('SonarQube Analysis') {
-      steps {
-        withSonarQubeEnv('My SonarQube Server') {
-          sh 'sonar-scanner'
-        }
-      }
-    }
-
-    stage('Push Docker') {
-      steps {
-        sh 'docker tag inventory-app rizalamri/inventory-app:latest'
-        sh 'docker push rizalamri/inventory-app:latest'
-      }
-    }
-
-    stage('Deploy to Minikube') {
-      steps {
-        sh 'kubectl apply -f deployment.yaml'
-      }
+    failure {
+      echo 'Pipeline failed. Check the logs.'
     }
   }
 }
