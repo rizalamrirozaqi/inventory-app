@@ -1,9 +1,5 @@
 pipeline {
-  agent {
-    docker {
-      image 'python:3.10-slim'
-    }
-  }
+  agent any
 
   stages {
     stage('Checkout') {
@@ -12,9 +8,10 @@ pipeline {
       }
     }
 
-    stage('Install Dependencies') {
+    stage('Install Requirements') {
       steps {
-        sh 'pip install -r requirements.txt'
+        sh 'python3 --version'
+        sh 'pip3 install -r requirements.txt'
       }
     }
 
@@ -22,23 +19,6 @@ pipeline {
       steps {
         sh 'pytest tests/'
       }
-    }
-
-    stage('Build Docker') {
-      steps {
-        sh 'echo Building Docker Image...'
-        // Optional: Build image if Docker-in-Docker enabled
-        // sh 'docker build -t inventory-app .'
-      }
-    }
-  }
-
-  post {
-    success {
-      echo 'Pipeline finished successfully!'
-    }
-    failure {
-      echo 'Pipeline failed. Check the logs.'
     }
   }
 }
