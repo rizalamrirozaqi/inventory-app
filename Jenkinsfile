@@ -1,5 +1,9 @@
 pipeline {
-    agent any
+    agent {
+        docker {
+            image 'python:3.10' 
+        }
+    }
 
     stages {
         stage('Clone Repo') {
@@ -22,11 +26,8 @@ pipeline {
 
         stage('Run Integration Tests') {
             steps {
-                // Jalankan server Flask di background
                 sh 'python app/main.py &'
-                // Tunggu server ready
                 sh 'sleep 5'
-                // Jalankan tes integrasi
                 sh 'pytest tests/test_integrasi.py --junitxml=integration-report.xml'
             }
         }
